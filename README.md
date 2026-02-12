@@ -1,41 +1,41 @@
 # Approval System
 
-Spring Boot 3.5.10 + Java 21 (LTS) 기반 최소 결재 시스템 구현
+Spring Boot 3.5.10 + Kotlin 2.1.0 기반 최소 결재 시스템 구현
 
 ## 핵심 구현 증명
 
 1. **상태머신 (Server-driven State Machine)**
-   - `Approval.java:44-68` - 서버가 상태 전이를 제어
+   - `Approval.kt:49-70` - 서버가 상태 전이를 제어
    - DRAFT → IN_PROGRESS → APPROVED 자동 전환
    - ACTIVE step만 승인 가능
 
 2. **트랜잭션 경계 (Transaction Boundary)**
-   - `ApprovalService.java:33` - `@Transactional` 단일 트랜잭션
+   - `ApprovalService.kt:22` - `@Transactional` 단일 트랜잭션
    - 검증 → 상태 전이 → 액션 로그 → Outbox 이벤트 저장이 하나의 원자적 작업
 
 3. **멱등성 (Idempotency)**
-   - `ApprovalActionLog.java:14-18` - Unique constraint로 중복 방지
-   - `ApprovalService.java:37-49` - 같은 idempotencyKey 요청 시 동일 결과 반환
+   - `ApprovalActionLog.kt:10-15` - Unique constraint로 중복 방지
+   - `ApprovalService.kt:25-35` - 같은 idempotencyKey 요청 시 동일 결과 반환
 
 4. **Outbox Pattern**
-   - `OutboxEvent.java` - 이벤트를 DB에 먼저 저장
-   - `ApprovalService.java:73-93` - 트랜잭션 내에서 이벤트 저장
+   - `OutboxEvent.kt` - 이벤트를 DB에 먼저 저장
+   - `ApprovalService.kt:75-102` - 트랜잭션 내에서 이벤트 저장
    - 향후 별도 프로세스가 PENDING 이벤트를 폴링하여 메시지 브로커로 발행 (현재는 저장만)
 
 ## 시작하기
 
 ### 사전 요구사항
 
-- **Java 21 (LTS)** 이상 설치 필요
+- **JDK 21 (LTS)** 이상 설치 필요
 - Docker (PostgreSQL 실행용)
 
-Java 21 설치 확인:
+JDK 설치 확인:
 ```bash
 java -version
 # java version "21.x.x" 출력되어야 함
 ```
 
-Java 21이 없다면 [Adoptium](https://adoptium.net/) 또는 [Oracle JDK](https://www.oracle.com/java/technologies/downloads/#java21)에서 설치하세요.
+JDK 21이 없다면 [Adoptium](https://adoptium.net/) 또는 [Oracle JDK](https://www.oracle.com/java/technologies/downloads/#java21)에서 설치하세요.
 
 ### 1. PostgreSQL 실행
 
@@ -160,7 +160,8 @@ github.lms.approval
 
 ## 기술 스택
 
-- Java 21 (LTS)
+- Kotlin 2.1.0
+- JDK 21 (LTS)
 - Spring Boot 3.5.10
 - Spring Data JPA
 - PostgreSQL 16
